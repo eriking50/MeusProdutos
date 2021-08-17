@@ -19,14 +19,26 @@ namespace MyProducts.Controllers
         {
             _context = context;
         }
-        //GET meusprodutos/produtos
+        /// <summary>
+        /// Retorna os produtos cadastrados no sistema
+        /// </summary>
+        /// <returns>Produtos cadastrados no sistema</returns>
+        /// <response code="200">Lista de produtos retornada com sucesso</response>
         [HttpGet]
+        [ProducesResponseType(200)]
         public async Task<IEnumerable<Product>> GetProductsAsync()
         {
             return await _context.Products.ToListAsync();
         }
-        //GET meusprodutos/produtos/id
+        /// <summary>
+        /// Retorna um produto com o Id correspondente
+        /// </summary>
+        /// <returns>Um produto baseado no Id</returns>
+        /// <response code="200">Produto retornado com sucesso</response>
+        /// <response code="404">O Id não foi encontrado no sistema</response>
         [HttpGet("{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         public async Task<ActionResult<Product>> GetProductAsync(int id)
         {
             var product = await _context.Products.FindAsync(id);
@@ -36,8 +48,15 @@ namespace MyProducts.Controllers
             }
             return product;
         }
-        //POST meusprodutos/produtos
+        /// <summary>
+        /// Cria um produto no banco de dados
+        /// </summary>
+        /// <returns>Produto criado</returns>
+        /// <response code="201">Produtos cadastrado com sucesso</response>
+        /// <response code="400">Algum dos dados informados não segue o padrão especificado</response>
         [HttpPost]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
         public async Task<ActionResult<Product>> CreateProductAsync(ProductDto product)
         {
             int lastId = await _context.Products.Select(u => u.Id).DefaultIfEmpty().MaxAsync();
@@ -53,8 +72,14 @@ namespace MyProducts.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetProductAsync), new {id = crtProduct.Id }, crtProduct);
         }
-        //PUT meusprodutos/produtos/id
+        /// <summary>
+        /// Atualiza o produto com o Id correspondente
+        /// </summary>
+        /// <response code="204">Produto atualizado com sucesso</response>
+        /// <response code="400">O Id não foi encontrado no sistema ou algum dos dados informado não segue o padrão especificado</response>
         [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
         public async Task<ActionResult> UpdateProductAsync(int id, ProductDto product)
         {
             bool hasProduct = await _context.Products.AnyAsync(p => p.Id == id);
@@ -73,8 +98,14 @@ namespace MyProducts.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
-        //DELETE meusprodutos/produtos/id
+        /// <summary>
+        /// Deleta o produto com o Id correspondente
+        /// </summary>
+        /// <response code="204">Produto deletado com sucesso</response>
+        /// <response code="400">O Id não foi encontrado no sistema</response>
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
         public async Task<ActionResult> DeleteProductAsync(int id)
         {
             bool hasProduct = await _context.Products.AnyAsync(p => p.Id == id);

@@ -5,7 +5,7 @@
 
 ## Instruções
 
-Antes de tudo instalar o banco de dados MariaDB em seu computador.
+Antes de tudo instalar o banco de dados [MariaDB](https://mariadb.org) e o [SDK do Asp Net 5](https://dotnet.microsoft.com/download/dotnet/5.0) em seu computador.
 
 Após instalar o banco de dados alterar no arquivo **appsettings.json**, na linha 4:
 

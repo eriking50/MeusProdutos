@@ -7,10 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MyProducts.Data;
 
 namespace MyProducts
 {
@@ -26,8 +28,13 @@ namespace MyProducts
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            string connectionString = Configuration.GetConnectionString("MyProductsContext");
+            services.AddDbContext<MyProductsContext>(options => 
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
             services.AddControllers();
+            services.AddControllers(options => {
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MyProducts", Version = "v1" });

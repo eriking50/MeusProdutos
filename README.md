@@ -6,13 +6,14 @@
 ## Instruções
 
 Antes de tudo instalar o banco de dados MariaDB em seu computador.
-Com os arquivos clonados em seu computador rodar as Migrations do Banco de Dados com o comandos:
 
 Após instalar o banco de dados alterar no arquivo **appsettings.json**, na linha 4:
 
 	"MyProductsContext":  "Server=server;User Id=user;Password=pass;Database=database"
 
 onde **server** é o local onde você irá rodar o servidor, como é um projeto para estudos localhost é uma boa opção, **user** é um nome de usuário do seu banco de dados que tem autorizações de leitura e escrita, **pass** a senha do usuário informado e **database** será o nome da tabela criada
+
+Com os arquivos clonados em seu computador rodar as Migrations do Banco de Dados com o comandos:
 
 ### no Visual Studio 
 	

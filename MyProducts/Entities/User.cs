@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyProducts.Entities
 {
+    /// <summary>
+    /// Entidade de Usuários
+    /// </summary>
     public class User
     {
         public int Id { get; set; }

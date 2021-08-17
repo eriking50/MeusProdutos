@@ -7,9 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyProducts.Entities;
 using MyProducts.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MyProducts.Controllers
 {
+    /// <summary>
+    /// Classe que cuida das rotas de produtos
+    /// </summary>
     [Route("meusprodutos/produtos")]
     [ApiController]
     public class ProductsController : ControllerBase
@@ -26,9 +30,9 @@ namespace MyProducts.Controllers
         /// <response code="200">Lista de produtos retornada com sucesso</response>
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<IEnumerable<Product>> GetProductsAsync()
+        public async Task<IEnumerable<ProductReturnDto>> GetProductsAsync()
         {
-            return await _context.Products.ToListAsync();
+            return (await _context.Products.ToListAsync()).Select(product => product.AsProductReturnDto());
         }
         /// <summary>
         /// Retorna um produto com o Id correspondente
@@ -39,14 +43,15 @@ namespace MyProducts.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<Product>> GetProductAsync(int id)
+        
+        public async Task<ActionResult<ProductReturnDto>> GetProductAsync(int id)
         {
             var product = await _context.Products.FindAsync(id);
             if(product == null)
             {
                 return NotFound();
             }
-            return product;
+            return product.AsProductReturnDto();
         }
         /// <summary>
         /// Cria um produto no banco de dados
@@ -54,10 +59,13 @@ namespace MyProducts.Controllers
         /// <returns>Produto criado</returns>
         /// <response code="201">Produtos cadastrado com sucesso</response>
         /// <response code="400">Algum dos dados informados não segue o padrão especificado</response>
+        /// <response code="401">Você não tem autorização para esta ação</response>
         [HttpPost]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Product>> CreateProductAsync(ProductDto product)
+        [ProducesResponseType(401)]
+        [Authorize]
+        public async Task<ActionResult<ProductReturnDto>> CreateProductAsync(ProductDto product)
         {
             int lastId = await _context.Products.Select(u => u.Id).DefaultIfEmpty().MaxAsync();
             Product crtProduct = new()
@@ -70,16 +78,19 @@ namespace MyProducts.Controllers
 
             _context.Products.Add(crtProduct);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetProductAsync), new {id = crtProduct.Id }, crtProduct);
+            return CreatedAtAction(nameof(GetProductAsync), new {id = crtProduct.Id }, crtProduct.AsProductReturnDto());
         }
         /// <summary>
         /// Atualiza o produto com o Id correspondente
         /// </summary>
         /// <response code="204">Produto atualizado com sucesso</response>
         /// <response code="400">O Id não foi encontrado no sistema ou algum dos dados informado não segue o padrão especificado</response>
+        /// <response code="401">Você não tem autorização para esta ação</response>
         [HttpPut("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [Authorize]
         public async Task<ActionResult> UpdateProductAsync(int id, ProductDto product)
         {
             bool hasProduct = await _context.Products.AnyAsync(p => p.Id == id);
@@ -103,9 +114,12 @@ namespace MyProducts.Controllers
         /// </summary>
         /// <response code="204">Produto deletado com sucesso</response>
         /// <response code="400">O Id não foi encontrado no sistema</response>
+        /// <response code="401">Você não tem autorização para esta ação</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [Authorize]
         public async Task<ActionResult> DeleteProductAsync(int id)
         {
             bool hasProduct = await _context.Products.AnyAsync(p => p.Id == id);
